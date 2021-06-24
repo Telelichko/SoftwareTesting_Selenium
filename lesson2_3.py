@@ -11,8 +11,22 @@ def driver(request):
     request.addfinalizer(wd.quit)
     return wd
 
+def test_authorization_admin_panel(driver):
+    main_page_url = 'http://localhost/litecart/admin/'
+    driver.get(main_page_url)
+
+    input_username = driver.find_element_by_name('username')
+    input_username.send_keys('admin')
+
+    input_password = driver.find_element_by_name('password')
+    input_password.send_keys('nimda')
+
+    button_login = driver.find_element_by_name('login')
+    button_login.click()
+
+
 # Preconditions: Create new customer with email - store@gmail.com,  password - admin
-def test_authorization(driver):
+def test_authorization_in_main_page(driver):
     main_page_url = 'http://localhost/litecart/'
     driver.get(main_page_url)
 
