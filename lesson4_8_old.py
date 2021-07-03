@@ -24,7 +24,7 @@ def test_authorization_main_page(driver):
     main_page_url = 'http://localhost/litecart/'
     driver.get(main_page_url)
 
-def test_check_sections(driver):
+def test_check_stickers_exist(driver):
     test_authorization_main_page(driver)
 
     products = driver.find_elements_by_class_name('product')
@@ -36,7 +36,7 @@ def test_check_sections(driver):
 
         product_stickers = item.find_elements_by_xpath('//div[contains(@class, "sticker")]')
 
-        if(len(product_stickers) != 1):
+        if(len(product_stickers) != 0):
             products_without_stickers.append(product_name.text)
             test_passed = False
 
