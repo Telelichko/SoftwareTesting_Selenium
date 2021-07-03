@@ -36,7 +36,7 @@ def test_check_sections(driver):
 
         product_stickers = item.find_elements_by_xpath('//div[contains(@class, "sticker")]')
 
-        if(len(product_stickers) == 0):
+        if(len(product_stickers) != 1):
             products_without_stickers.append(product_name.text)
             test_passed = False
 
