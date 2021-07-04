@@ -70,7 +70,7 @@ def test_check_sections_with_exception(driver):
 
     left_menu = driver.find_element_by_xpath('//div[contains(@id, "menu-wrapper")]')
 
-    sections = left_menu.find_elements_by_xpath('//li[@id = "app-"]//*[not(@class="docs")]//span[@class="name"]')
+    sections = left_menu.find_elements_by_xpath('.//li[@id = "app-"]//*[not(@class="docs")]//span[@class="name"]')
 
     for item in sections:
         item.click()
