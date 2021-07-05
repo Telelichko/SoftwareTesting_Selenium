@@ -25,7 +25,7 @@ def test_check_stickers_count(driver):
     for item in products:
         product_name = item.find_element_by_class_name('name')
 
-        product_stickers = item.find_elements_by_xpath('//div[contains(@class, "sticker")]')
+        product_stickers = item.find_elements_by_xpath('.//div[contains(@class, "sticker")]')
 
         if(len(product_stickers) != 1):
             products_with_stickers_other_1.append(product_name.text)
