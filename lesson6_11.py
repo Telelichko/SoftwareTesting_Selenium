@@ -1,5 +1,5 @@
 import random
-
+import rstr
 import pytest
 from selenium import webdriver
 
@@ -11,7 +11,6 @@ def driver(request):
     request.addfinalizer(wd.quit)
     return wd
 
-
 def test_create_account(driver):
     main_page_url = 'http://localhost/litecart/'
 
@@ -20,27 +19,35 @@ def test_create_account(driver):
     link_registration = driver.find_element_by_link_text('New customers click here')
     link_registration.click()
 
-    inputs = driver.find_elements_by_tag_name('input')
+    inputs = driver.find_elements_by_xpath(f'//input[not(@type="hidden") and not(@type="checkbox")]')
 
-    for input in inputs:
-        parent_input_text = input.find_element_by_xpath('//parent::td[1]').text
+    for i, input in enumerate(inputs):
+        input = driver.find_elements_by_xpath(f'//input[not(@type="hidden") and not(@type="checkbox")]')[i]
+        parent_input_text = input.find_element_by_xpath('.//parent::td').text
 
-        if parent_input_text == 'Postcode':
+        if 'Postcode' in parent_input_text:
             input_text = '012345'
-        elif parent_input_text == 'Email':
-            input_text = 'mail@mail.com'
-        elif parent_input_text == 'Phone':
+        elif 'Email' in parent_input_text:
+            input_text = rstr.xeger(r'[a-z][a-z0-9]{6}')
+            input_text += '@mail.com'
+        elif 'Phone' in parent_input_text:
             input_text = '799999999'
         elif 'Password' in parent_input_text:
             input_text = 'Password'
         else:
-            # TODO: !!! 1 проблема - "ElementNotInteractableException: Message: element not interactable" -
-            # TODO: Поле ввода под "Tax ID" не предназначено для взаимодействий !!!
             input_text = parent_input_text
+            input_text += str(random.randint(100, 999))
 
-        # TODO: !!! 2 проблема - Как быть с полем для "CAPTCHA" ???
-
-
-        input_text += str(random.randint(100, 999))
         input.send_keys(input_text)
+
+    button_create = driver.find_element_by_xpath('//button[text()="Create Account"]')
+    button_create.click()
+
+    # TODO: Добавить пункты 2-3
+    # 2) выход (logout), потому что после успешной регистрации автоматически происходит вход,
+    # 3) повторный вход в только что созданную учётную запись,
+    # 4) и ещё раз выход.
+
+
+    something = 1
 
