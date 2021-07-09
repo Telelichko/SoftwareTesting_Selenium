@@ -21,6 +21,7 @@ def test_create_account(driver):
 
     inputs = driver.find_elements_by_xpath(f'//input[not(@type="hidden") and not(@type="checkbox")]')
 
+    password = ''
     for i, input in enumerate(inputs):
         input = driver.find_elements_by_xpath(f'//input[not(@type="hidden") and not(@type="checkbox")]')[i]
         parent_input_text = input.find_element_by_xpath('.//parent::td').text
@@ -30,10 +31,16 @@ def test_create_account(driver):
         elif 'Email' in parent_input_text:
             input_text = rstr.xeger(r'[a-z][a-z0-9]{6}')
             input_text += '@mail.com'
+            email = input_text
         elif 'Phone' in parent_input_text:
-            input_text = '799999999'
+            input_text = '+7'
+            input_text += rstr.xeger(r'[0-9]{8}')
         elif 'Password' in parent_input_text:
-            input_text = 'Password'
+            if password == '':
+                input_text = rstr.xeger(r'[a-z][a-z0-9]{7}')
+                password = input_text
+            else:
+                input_text = password
         else:
             input_text = parent_input_text
             input_text += str(random.randint(100, 999))
@@ -43,11 +50,17 @@ def test_create_account(driver):
     button_create = driver.find_element_by_xpath('//button[text()="Create Account"]')
     button_create.click()
 
-    # TODO: Добавить пункты 2-3
-    # 2) выход (logout), потому что после успешной регистрации автоматически происходит вход,
-    # 3) повторный вход в только что созданную учётную запись,
-    # 4) и ещё раз выход.
+    link_logout = driver.find_element_by_xpath('//a[text()="Logout"]')
+    link_logout.click()
 
+    input_email = driver.find_element_by_xpath('//input[@name="email"]')
+    input_email.send_keys(email)
 
-    something = 1
+    input_password = driver.find_element_by_xpath('//input[@name="password"]')
+    input_password.send_keys(password)
 
+    link_login = driver.find_element_by_xpath('//button[text()="Login"]')
+    link_login.click()
+
+    link_logout = driver.find_element_by_xpath('//a[text()="Logout"]')
+    link_logout.click()
