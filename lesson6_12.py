@@ -25,46 +25,14 @@ def test_create_account(driver):
     button_add_product = driver.find_element_by_xpath('//a[contains(., "Add New Product")]')
     button_add_product.click()
 
-    # Достаточно заполнить только информацию на вкладках General, Information и Prices
-    # fill_general_info(driver)
+    fill_tab_general(driver)
 
-    # fill_information_info(driver)
+    fill_tab_information(driver)
 
-    tab_info = driver.find_element_by_xpath('//div[@class="tabs"]//a[contains(text(), "Information")]')
-    tab_info.click()
+    fill_tab_prices(driver)
 
-    list_manufacturer = get_list(driver, 'Manufacturer')
-    list_manufacturer.click()
-
-    list_item_manufacturer = get_list_item(driver, 'Manufacturer', 'ACME Corp.')
-    list_item_manufacturer.click()
-
-    list_supplier = get_list(driver, 'Supplier')
-    list_supplier.click()
-
-    list_item_supplier = get_list_item(driver, 'Supplier', 'Select')
-    list_item_supplier.click()
-
-    input_keywords = get_input_by_type(driver, 'Keywords', 'text')
-    input_keywords.send_keys('Keywords')
-
-    input_short_description = get_input_by_type(driver, 'Short Description', 'text')
-    input_short_description.send_keys('Short Description')
-
-    # area_description = driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "Description")]'
-    #                                      f'//div[contains(@class, "editor")]')
-    # area_description.send_keys('Description')
-
-
-    area_description = driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "Description")]'
-                                                    f'//textarea')
-
-    area_description.send_keys('Description')
-
-    # fill_prices_info(driver)
-
-
-
+    # TODO: Добавить сохранение и проверку добавления продукта
+    # button_save =
 
     something = 1
 
@@ -85,7 +53,7 @@ def test_authorization_admin_panel(driver):
     button_login = driver.find_element_by_name('login')
     button_login.click()
 
-def fill_general_info(driver):
+def fill_tab_general(driver):
     radiobutton_status = driver.find_element_by_xpath('//div[@class="content"]//tr[contains(., "Status")]//label[contains(., "Enabled")]')
     radiobutton_status.click()
 
@@ -93,7 +61,7 @@ def fill_general_info(driver):
     input_name.send_keys('Dudu')
 
     input_code = get_input_by_type(driver, 'Code', 'text')
-    input_code.send_keys(12345)
+    input_code.send_keys(random.randint(100, 999))
 
     checkbox_category = get_checkboxs_item(driver, 'Categories', 'Rubber Ducks')
     checkbox_category.click()
@@ -122,6 +90,66 @@ def fill_general_info(driver):
     date_input_to = get_input_by_type(driver, 'Date Valid To', 'date')
     date_input_to.click()
 
+def fill_tab_information(driver):
+    tab_info = get_tab(driver, 'Information')
+    tab_info.click()
+
+    list_manufacturer = get_list(driver, 'Manufacturer')
+    list_manufacturer.click()
+
+    list_item_manufacturer = get_list_item(driver, 'Manufacturer', 'ACME Corp.')
+    list_item_manufacturer.click()
+
+    list_supplier = get_list(driver, 'Supplier')
+    list_supplier.click()
+
+    list_item_supplier = get_list_item(driver, 'Supplier', 'Select')
+    list_item_supplier.click()
+
+    input_keywords = get_input_by_type(driver, 'Keywords', 'text')
+    input_keywords.send_keys('Keywords')
+
+    input_short_description = get_input_by_type(driver, 'Short Description', 'text')
+    input_short_description.send_keys('Short Description')
+
+    area_description = driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "Description")]//div[@contenteditable="true"]')
+    area_description.send_keys('Description')
+
+    input_head_title = get_input_by_type(driver, 'Head Title', 'text')
+    input_head_title.send_keys('Head Title')
+
+    input_meta_description = get_input_by_type(driver, 'Meta Description', 'text')
+    input_meta_description.send_keys('Meta Description')
+
+def fill_tab_prices(driver):
+    tab_prices = get_tab(driver, 'Prices')
+    tab_prices.click()
+
+    input_purchase_price = get_input_by_type(driver, 'Purchase Price', 'number')
+    input_purchase_price.clear()
+    input_purchase_price.send_keys('50')
+
+    list_purchase_price = get_list(driver, 'Purchase Price')
+    list_purchase_price.click()
+
+    list_item_category = get_list_item(driver, 'Purchase Price', 'Euros')
+    list_item_category.click()
+
+    input_price_usd = get_input_by_name_value(driver, 'gross_prices[USD]')
+    input_price_usd.clear()
+    input_price_usd.send_keys('40')
+
+    input_gross_price_usd = get_input_by_name_value(driver, 'gross_prices[USD]')
+    input_gross_price_usd.clear()
+    input_gross_price_usd.send_keys('33')
+
+    input_price_eur = get_input_by_name_value(driver, 'prices[EUR]')
+    input_price_eur.clear()
+    input_price_eur.send_keys('50')
+
+    input_gross_price_eur = get_input_by_name_value(driver, 'gross_prices[EUR]')
+    input_gross_price_eur.clear()
+    input_gross_price_eur.send_keys('40')
 
 def get_list(driver, list_name):
     return driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "{list_name}")]//select')
@@ -137,5 +165,11 @@ def get_checkboxs_item(driver, checkbox_name, item):
 def get_input_by_type(driver, input_name, input_type):
     return driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "{input_name}")]'
                                         f'//input[@type="{input_type}"]')
+
+def get_input_by_name_value(driver, name_value):
+    return driver.find_element_by_xpath(f'//div[@class="content"]//input[@name="{name_value}"]')
+
+def get_tab(driver, tab_name):
+    return driver.find_element_by_xpath(f'//div[@class="tabs"]//a[contains(text(), "{tab_name}")]')
 
 #endregion
