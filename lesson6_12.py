@@ -1,11 +1,11 @@
 import os
 import random
 import time
+from datetime import date, timedelta
 
 import rstr
 import pytest
 from selenium import webdriver
-
 
 @pytest.fixture()
 def driver(request):
@@ -31,18 +31,18 @@ def test_create_account(driver):
 
     fill_tab_prices(driver)
 
-    # TODO: Добавить сохранение и проверку добавления продукта
-    # button_save =
+    button_save = driver.find_element_by_xpath('//td[@id="content"]//button[contains(., "Save")]')
+    button_save.click()
 
-    something = 1
+    assert_row_in_table(driver, 'Dudu Duck')
 
 #endregion
 
 #region ACTIONS_METHODS_REGION
 
 def test_authorization_admin_panel(driver):
-    main_page_url = 'http://localhost/litecart/admin/'
-    driver.get(main_page_url)
+    admin_page_url = 'http://localhost/litecart/admin/'
+    driver.get(admin_page_url)
 
     input_username = driver.find_element_by_name('username')
     input_username.send_keys('admin')
@@ -58,7 +58,7 @@ def fill_tab_general(driver):
     radiobutton_status.click()
 
     input_name = get_input_by_type(driver, 'Name', 'text')
-    input_name.send_keys('Dudu')
+    input_name.send_keys('Dudu Duck')
 
     input_code = get_input_by_type(driver, 'Code', 'text')
     input_code.send_keys(random.randint(100, 999))
@@ -82,13 +82,14 @@ def fill_tab_general(driver):
     file_input_upload_image = get_input_by_type(driver, 'Upload Images', 'file')
     file_input_upload_image.send_keys(os.getcwd() + '\static\images\Dudu.jpg')
 
-    #TODO: Сгенерировать через регулярное выражение или выбрать текущий день из списка
-    date_input_from = get_input_by_type(driver, 'Date Valid From', 'date')
-    date_input_from.click()
+    today = date.today().strftime("%m.%d.%Y")
+    day_in_future = (date.today() + timedelta(days=3)).strftime("%m.%d.%Y")
 
-    #TODO: Сгенерировать через регулярное выражение или выбрать текущий день из списка
+    date_input_from = get_input_by_type(driver, 'Date Valid From', 'date')
+    date_input_from.send_keys(today)
+
     date_input_to = get_input_by_type(driver, 'Date Valid To', 'date')
-    date_input_to.click()
+    date_input_to.send_keys(day_in_future)
 
 def fill_tab_information(driver):
     tab_info = get_tab(driver, 'Information')
@@ -160,7 +161,7 @@ def get_list_item(driver, list_name, item):
 
 def get_checkboxs_item(driver, checkbox_name, item):
     return driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "{checkbox_name}")]'
-                                        f'//td[contains(., "{item}")]')
+                                        f'//td[contains(., "{item}")]/preceding-sibling::td//input')
 
 def get_input_by_type(driver, input_name, input_type):
     return driver.find_element_by_xpath(f'//div[@class="content"]//tr[contains(., "{input_name}")]'
@@ -171,5 +172,14 @@ def get_input_by_name_value(driver, name_value):
 
 def get_tab(driver, tab_name):
     return driver.find_element_by_xpath(f'//div[@class="tabs"]//a[contains(text(), "{tab_name}")]')
+
+#endregion
+
+#region ASSERTS_METHODS_REGION
+
+def assert_row_in_table(driver, name):
+    expected_rows = driver.find_elements_by_xpath(f'//table//td//a[text()="{name}"]')
+
+    assert len(expected_rows) > 0, f'The row with text "{name}" didn\'t found.'
 
 #endregion
