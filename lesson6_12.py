@@ -1,9 +1,6 @@
 import os
 import random
-import time
 from datetime import date, timedelta
-
-import rstr
 import pytest
 from selenium import webdriver
 
