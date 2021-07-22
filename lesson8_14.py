@@ -17,8 +17,8 @@ def driver(request):
 def test_open_links_countries(driver):
     test_authorization_admin_panel(driver)
 
-    catalog_section = driver.find_element_by_xpath('//div[contains(@id, "menu-wrapper")]//span[contains(text(), "Countries")]')
-    catalog_section.click()
+    countries_section = driver.find_element_by_xpath('//div[contains(@id, "menu-wrapper")]//span[contains(text(), "Countries")]')
+    countries_section.click()
 
     link_first_country = driver.find_element_by_xpath('//table[@class="dataTable"]//a')
     link_first_country.click()

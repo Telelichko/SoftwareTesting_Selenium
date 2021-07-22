@@ -7,13 +7,14 @@ from selenium.webdriver.common.by import By
 @pytest.fixture()
 def driver(request):
     wd = webdriver.Chrome()
-    wd.implicitly_wait(2)
+    wd.implicitly_wait(10)
     request.addfinalizer(wd.quit)
     return wd
 
 #region TESTS_METHODS_REGION
 
 def test_add_delete_cart_products(driver):
+
     for i in range(3):
         add_product_to_cart(driver)
 

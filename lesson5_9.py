@@ -12,26 +12,10 @@ def driver(request):
 
 #region TESTS_METHODS_REGION
 
-def test_authorization_admin_panel(driver):
-    main_page_url = 'http://localhost/litecart/admin/'
-    driver.get(main_page_url)
-
-    input_username = driver.find_element_by_name('username')
-    input_username.send_keys('admin')
-
-    input_password = driver.find_element_by_name('password')
-    input_password.send_keys('nimda')
-
-    button_login = driver.find_element_by_name('login')
-    button_login.click()
-
-def test_go_countries_page(driver):
-    countries_page_url = 'http://localhost/litecart/admin/?app=countries&doc=countries'
-    driver.get(countries_page_url)
 
 def test_countries_sorted_alphabetically(driver):
-    test_authorization_admin_panel(driver)
-    test_go_countries_page(driver)
+    authorization_in_admin_panel(driver)
+    go_to_countries_page(driver)
 
     table_countries = driver.find_element_by_xpath('//table[@class="dataTable"]')
 
@@ -66,11 +50,28 @@ def test_countries_sorted_alphabetically(driver):
 
         assert_countries_sorted_alphabetically(list_names, f'Edit Country "{country_name}"')
 
-        test_go_countries_page(driver)
+        go_to_countries_page(driver)
 
 #endregion
 
 #region ACTIONS_METHODS_REGION
+
+def authorization_in_admin_panel(driver):
+    main_page_url = 'http://localhost/litecart/admin/'
+    driver.get(main_page_url)
+
+    input_username = driver.find_element_by_name('username')
+    input_username.send_keys('admin')
+
+    input_password = driver.find_element_by_name('password')
+    input_password.send_keys('nimda')
+
+    button_login = driver.find_element_by_name('login')
+    button_login.click()
+
+def go_to_countries_page(driver):
+    countries_page_url = 'http://localhost/litecart/admin/?app=countries&doc=countries'
+    driver.get(countries_page_url)
 
 def is_in_alphabetical_order(list_words):
     for i in range(len(list_words) - 1):
