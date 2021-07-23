@@ -23,51 +23,40 @@ def driver(request):
 def test_check_prices_colors_sizes(driver):
     go_to_main_page(driver)
 
-    product = driver.find_element_by_xpath(f'//div[@id="box-campaigns"]//li[contains(@class, "product")]')
-    element_product_link = product.find_element_by_xpath(f'.//a')
-    product_name = element_product_link.get_attribute('title')
+    products = driver.find_elements_by_xpath('//div[@id="box-latest-products"]//li[contains(@class, "product")]')
 
-    element_price = get_first_element_or_none(product.find_elements_by_class_name('price'))
-    element_regular_price = get_first_element_or_none(product.find_elements_by_class_name('regular-price'))
-    element_campaign_price = get_first_element_or_none(product.find_elements_by_class_name('campaign-price'))
+    for i, item in enumerate(products):
+        item = driver.find_element_by_xpath(f'//div[@id="box-latest-products"]//li[contains(@class, "product")][{i + 1}]')
+        element_product_link = item.find_element_by_xpath(f'.//a')
+        product_name = element_product_link.get_attribute('title')
 
-    check_color_size_prices(driver, product_name, element_price, element_regular_price, element_campaign_price)
+        price, regular_price, campaign_price = get_prices(item, product_name)
 
-    text_price = get_text_or_none(element_price)
-    text_regular_price = get_text_or_none(element_regular_price)
-    text_campaign_price = get_text_or_none(element_campaign_price)
+        driver.get(element_product_link.get_attribute('href'))
 
-    driver.get(element_product_link.get_attribute('href'))
+        item_inside = driver.find_element_by_xpath('//div[@id="box-product"]')
 
-    product_inside = driver.find_element_by_xpath('//div[@id="box-product"]')
+        element_product_name_inside = item_inside.find_element_by_class_name('title')
+        product_name_inside = element_product_name_inside.text
 
-    element_product_name_inside = product_inside.find_element_by_class_name('title')
-    product_name_inside = element_product_name_inside.text
+        price_inside, regular_price_inside, campaign_price_inside = get_prices(item_inside, product_name_inside)
 
-    element_price_inside = get_first_element_or_none(product_inside.find_elements_by_class_name('price'))
-    element_regular_price_inside = get_first_element_or_none(product_inside.find_elements_by_class_name('regular-price'))
-    element_campaign_price_inside = get_first_element_or_none(product_inside.find_elements_by_class_name('campaign-price'))
+        assert product_name == product_name_inside, \
+            f'Names of product "{product_name}" aren\'t the same ("{product_name}" != "{product_name_inside}").'
 
-    check_color_size_prices(driver, element_product_name_inside, element_price_inside, element_regular_price_inside,
-                            element_campaign_price_inside)
+        assert price == price_inside, \
+            f'The simple prices in product "{product_name}" aren\'t the same ("{price}" != "{price_inside}").'
 
-    text_price_inside = get_text_or_none(element_price_inside)
-    text_regular_price_inside = get_text_or_none(element_regular_price_inside)
-    text_campaign_price_inside = get_text_or_none(element_campaign_price_inside)
+        assert regular_price == regular_price_inside, \
+            f'The simple prices in product "{product_name}" aren\'t the same ("{regular_price}" != "{regular_price_inside}").'
 
-    assert product_name == product_name_inside, \
-        f'Names of product "{product_name}" aren\'t the same ("{product_name}" != "{product_name_inside}").'
+        assert campaign_price == campaign_price_inside, \
+            f'The simple prices in product "{product_name.text}" aren\'t the same ("{campaign_price}" != "{campaign_price_inside}").'
 
-    assert text_price == text_price_inside, \
-        f'The simple prices in product "{product_name}" aren\'t the same ("{text_price}" != "{price_inside}").'
+        go_to_main_page(driver)
 
-    assert text_regular_price == text_regular_price_inside, \
-        f'The simple prices in product "{product_name}" aren\'t the same ("{text_regular_price}" != "{regular_price_inside}").'
-
-    assert text_campaign_price == text_campaign_price_inside, \
-        f'The simple prices in product "{product_name.text}" aren\'t the same ("{text_campaign_price}" != "{campaign_price_inside}").'
-
-    go_to_main_page(driver)
+        # We check only one product. Without break check all.
+        break;
 
 #endregion
 
@@ -121,11 +110,11 @@ def parse_element_color_to_components(element):
     r, g, b = int(color_components[0]), int(color_components[1]), int(color_components[2])
     return r, g, b
 
-#endregion
+def get_prices(element, product_name):
+    element_price = get_first_element_or_none(element.find_elements_by_class_name('price'))
+    element_regular_price = get_first_element_or_none(element.find_elements_by_class_name('regular-price'))
+    element_campaign_price = get_first_element_or_none(element.find_elements_by_class_name('campaign-price'))
 
-#region ASSERTS_METHODS_REGION
-
-def check_color_size_prices(driver, product_name, element_price, element_regular_price, element_campaign_price):
     if element_price != None:
         assert_element_without_line(element_price)
         assert_element_grey_color(element_price)
@@ -147,8 +136,17 @@ def check_color_size_prices(driver, product_name, element_price, element_regular
 
     if(check_element_or_none(element_regular_price) !=  check_element_or_none(element_campaign_price)):
         raise Exception(f'There is one price instead 2 in product "{product_name}" '
-                        f'(regular price = "{get_text_or_none(element_regular_price)}", '
-                        f'campaign price = "{get_text_or_none(element_campaign_price)}").')
+                        f'(regular price = "{get_text_or_none(element_regular_price)}", campaign price = "{get_text_or_none(element_campaign_price)}").')
+
+    price = get_text_or_none(element_price)
+    regular_price = get_text_or_none(element_regular_price)
+    campaign_price = get_text_or_none(element_campaign_price)
+
+    return price, regular_price, campaign_price
+
+#endregion
+
+#region ASSERTS_METHODS_REGION
 
 def assert_element_grey_color(element):
     r, g, b = parse_element_color_to_components(element)
