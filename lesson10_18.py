@@ -3,8 +3,9 @@ from selenium import webdriver
 
 @pytest.fixture()
 def driver(request):
-    wd = webdriver.Chrome(desired_capabilities={"proxy": {"proxyType": "MANUAL", "httpProxy": "localhost:8080"}})
-    # wd = webdriver.Chrome()
+    # Information about mitmproxy: https://selectel.ru/blog/analiz-http-trafika-s-mitmproxy/
+    # https://www.youtube.com/watch?v=LbPKgknr8m8
+    wd = webdriver.Chrome(desired_capabilities={" proxy": {"proxyType": "MANUAL", "httpProxy": "localhost:8080"}})
     wd.implicitly_wait(10)
     request.addfinalizer(wd.quit)
     return wd
